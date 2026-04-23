@@ -1,0 +1,3 @@
+plate,make,model,year,color,locked,trunk_open,engine_running,panic_active,fuel_level,odometer
+ABC-1234,Toyota,Camry,2022,Silver,True,False,False,False,72.0,18450
+XYZ-0077,Honda,Civic,2024,Blue,True,False,False,False,54.5,6120
