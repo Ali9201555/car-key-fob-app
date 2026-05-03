@@ -122,7 +122,7 @@ class CarController:
         """Return all paired cars in insertion order."""
         return self._manager.list_cars()
 
-    def get_active(self):
+    def get_active(self) -> Car:
         """Return the currently active car, or None when the garage is empty.
 
         Returns:

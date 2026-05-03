@@ -17,6 +17,7 @@ from PyQt6.QtWidgets import (
 from controllers.auth_controller import AuthController
 from controllers.car_controller import CarController
 from controllers.fob_controller import FobActionResult, FobController
+from models.event_log import EventLog
 from models.fob_state import FobState
 from views.add_car_dialog import AddCarDialog
 from views.car_status_widget import CarStatusWidget
@@ -42,7 +43,7 @@ class MainWindow(QMainWindow):
         fob_controller: FobController,
         auth_controller: AuthController,
         fob_state: FobState,
-        event_log,
+        event_log: EventLog,
     ) -> None:
         """Build the UI and wire every signal to its controller method.
 
@@ -372,7 +373,7 @@ class MainWindow(QMainWindow):
     # Window lifecycle
     # ------------------------------------------------------------------
 
-    def closeEvent(self, event) -> None:  # noqa: N802 - Qt signature
+    def closeEvent(self, event: object) -> None:  # noqa: N802 - Qt signature
         """Persist state one last time before the window closes."""
         try:
             self._car_ctrl.save()

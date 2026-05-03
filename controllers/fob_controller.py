@@ -54,7 +54,7 @@ class FobController:
         self._fob = fob_state
         self._log = event_log
 
-    def _preflight(self):
+    def _preflight(self) -> FobActionResult:
         """Check conditions that would block any action.
 
         Returns:

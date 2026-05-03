@@ -94,6 +94,6 @@ class AddCarDialog(QDialog):
         self._created_car = car
         self.accept()
 
-    def created_car(self):
+    def created_car(self) -> Car:
         """Return the car that was paired, or None if the dialog was cancelled."""
         return self._created_car

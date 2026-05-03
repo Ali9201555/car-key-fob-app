@@ -141,7 +141,7 @@ class CarManager:
             raise KeyError(f"No car paired with plate {clean}.")
         self._active_plate = clean
 
-    def get_active(self):
+    def get_active(self) -> Car:
         """Return the currently active car, or None when empty.
 
         Returns:

@@ -37,7 +37,7 @@ class CarStatusWidget(QWidget):
         self._panic_flash = False
         self.setMinimumSize(380, 220)
 
-    def set_car(self, car) -> None:
+    def set_car(self, car: Car) -> None:
         """Change which car is currently rendered.
 
         Args:
