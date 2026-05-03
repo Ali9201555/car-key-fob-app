@@ -53,7 +53,7 @@ car_key_fob_app/
 └── data/
     ├── cars.csv             # Sample garage, seeded on first run
     ├── events.csv           # Created on first action
-    ├── fob_state.json       # Created on first use
+    ├── fob_state.txt        # Created on first use
     └── auth.txt             # Created on first launch
 ```
 
@@ -105,9 +105,9 @@ are shown in a dialog via a top-level `try/except` in `main.py`.
 ## Requirement checklist for Project 2
 
 - [x] GUI interface using PyQt6.
-- [x] Code separated into `models/`, `views/`, `controllers/` packages.
-- [x] Data stored in CSV files (`cars.csv`, `events.csv`) and JSON
-      (`fob_state.json`).
+- [x] Code split across multiple module files.
+- [x] Data stored in CSV files (`cars.csv`, `events.csv`) and text
+      files (`fob_state.txt`, `auth.txt`).
 - [x] Keyboard input validation on every editable field.
 - [x] Exception handling around all file I/O and dialog submissions.
 - [x] Docstrings for every class and function.

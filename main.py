@@ -48,7 +48,7 @@ def main() -> int:
     # Model layer ------------------------------------------------------
     car_manager = CarManager(os.path.join(data, "cars.csv"))
     event_log = EventLog(os.path.join(data, "events.csv"))
-    fob_state = FobState(os.path.join(data, "fob_state.json"))
+    fob_state = FobState(os.path.join(data, "fob_state.txt"))
     auth = UserAuth(os.path.join(data, "auth.txt"))
 
     # Controller layer -------------------------------------------------
