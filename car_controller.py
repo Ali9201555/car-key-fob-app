@@ -1,8 +1,8 @@
 """Controller for pairing, removing, and switching cars in the garage."""
 
-from models.car import Car
-from models.car_manager import CarManager
-from models.event_log import EventLog
+from car import Car
+from car_manager import CarManager
+from event_log import EventLog
 
 
 class CarController:

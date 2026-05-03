@@ -13,14 +13,14 @@ import traceback
 
 from PyQt6.QtWidgets import QApplication, QMessageBox
 
-from controllers.auth_controller import AuthController
-from controllers.car_controller import CarController
-from controllers.fob_controller import FobController
-from models.car_manager import CarManager
-from models.event_log import EventLog
-from models.fob_state import FobState
-from models.user_auth import UserAuth
-from views.main_window import MainWindow
+from auth_controller import AuthController
+from car_controller import CarController
+from fob_controller import FobController
+from car_manager import CarManager
+from event_log import EventLog
+from fob_state import FobState
+from user_auth import UserAuth
+from main_window import MainWindow
 
 
 def _data_dir() -> str:

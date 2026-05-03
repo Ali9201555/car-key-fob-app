@@ -4,7 +4,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor, QPainter, QPaintEvent, QPen, QBrush, QFont
 from PyQt6.QtWidgets import QWidget
 
-from models.car import Car
+from car import Car
 
 
 class CarStatusWidget(QWidget):

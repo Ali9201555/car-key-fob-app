@@ -13,8 +13,8 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from controllers.car_controller import CarController
-from models.car import Car
+from car_controller import CarController
+from car import Car
 
 
 class AddCarDialog(QDialog):

@@ -1,6 +1,6 @@
 """Controller wrapping PIN authentication for the UI layer."""
 
-from models.user_auth import UserAuth
+from user_auth import UserAuth
 
 
 class AuthController:

@@ -12,7 +12,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from models.event_log import EventLog
+from event_log import EventLog
 
 
 class HistoryView(QDialog):

@@ -3,7 +3,7 @@
 import csv
 import os
 
-from models.car import Car
+from car import Car
 
 
 class CarManager:

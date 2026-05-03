@@ -33,34 +33,28 @@ This project was built for CSCI 2680 Project 2.
 
 ```
 car_key_fob_app/
-├── main.py                     # Entry point, wires MVC together
+├── main.py                  # Entry point
+├── car.py                   # Car class + validation
+├── car_manager.py           # CSV-backed collection of cars
+├── event_log.py             # Timestamped event history
+├── fob_state.py             # Fob battery + signal persistence
+├── user_auth.py             # PIN authentication
+├── auth_controller.py       # PIN login + change-PIN
+├── car_controller.py        # Pair / remove / switch cars
+├── fob_controller.py        # Lock / unlock / trunk / panic / remote-start
+├── main_window.py           # Top-level QMainWindow
+├── car_status_widget.py     # Custom-painted car illustration
+├── fob_widget.py            # Virtual key fob buttons + battery
+├── add_car_dialog.py        # Pair a new car
+├── pin_dialog.py            # Enter PIN
+├── change_pin_dialog.py     # Replace current PIN
+├── history_view.py          # Event-history dialog
 ├── requirements.txt
-├── models/
-│   ├── __init__.py
-│   ├── car.py                  # Car dataclass + validation
-│   ├── car_manager.py          # CSV-backed collection of cars
-│   ├── event_log.py            # Timestamped event history
-│   ├── fob_state.py            # Fob battery + signal persistence
-│   └── user_auth.py            # Salted PIN authentication
-├── controllers/
-│   ├── __init__.py
-│   ├── auth_controller.py      # PIN login + change-PIN
-│   ├── car_controller.py       # Pair / remove / switch cars
-│   └── fob_controller.py       # Lock/unlock/trunk/panic/remote-start
-├── views/
-│   ├── __init__.py
-│   ├── main_window.py          # Top-level QMainWindow
-│   ├── car_status_widget.py    # Custom-painted car illustration
-│   ├── fob_widget.py           # Virtual key fob buttons + battery
-│   ├── add_car_dialog.py       # Pair a new car
-│   ├── pin_dialog.py           # Enter PIN
-│   ├── change_pin_dialog.py    # Replace current PIN
-│   └── history_view.py         # Event-history dialog
 └── data/
-    ├── cars.csv                # Sample garage, seeded on first run
-    ├── events.csv              # Created on first action
-    ├── fob_state.json          # Created on first use
-    └── auth.txt                # Created on first launch
+    ├── cars.csv             # Sample garage, seeded on first run
+    ├── events.csv           # Created on first action
+    ├── fob_state.json       # Created on first use
+    └── auth.txt             # Created on first launch
 ```
 
 ## Installation

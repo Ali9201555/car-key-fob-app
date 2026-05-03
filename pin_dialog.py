@@ -11,7 +11,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from controllers.auth_controller import AuthController
+from auth_controller import AuthController
 
 
 class PinDialog(QDialog):

@@ -14,17 +14,17 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from controllers.auth_controller import AuthController
-from controllers.car_controller import CarController
-from controllers.fob_controller import FobActionResult, FobController
-from models.event_log import EventLog
-from models.fob_state import FobState
-from views.add_car_dialog import AddCarDialog
-from views.car_status_widget import CarStatusWidget
-from views.change_pin_dialog import ChangePinDialog
-from views.fob_widget import FobWidget
-from views.history_view import HistoryView
-from views.pin_dialog import PinDialog
+from auth_controller import AuthController
+from car_controller import CarController
+from fob_controller import FobActionResult, FobController
+from event_log import EventLog
+from fob_state import FobState
+from add_car_dialog import AddCarDialog
+from car_status_widget import CarStatusWidget
+from change_pin_dialog import ChangePinDialog
+from fob_widget import FobWidget
+from history_view import HistoryView
+from pin_dialog import PinDialog
 
 
 class MainWindow(QMainWindow):
