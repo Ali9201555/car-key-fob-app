@@ -1,9 +1,5 @@
 """Dialog that prompts the user for their four-digit PIN."""
 
-from __future__ import annotations
-
-from typing import Optional
-
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QDialog,
@@ -29,7 +25,7 @@ class PinDialog(QDialog):
     def __init__(
         self,
         auth_controller: AuthController,
-        parent: Optional[QWidget] = None,
+        parent: QWidget = None,
     ) -> None:
         """Build the dialog widgets and wire up the submit button.
 

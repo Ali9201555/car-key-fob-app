@@ -1,7 +1,5 @@
 """Controller wrapping PIN authentication for the UI layer."""
 
-from __future__ import annotations
-
 from models.user_auth import UserAuth
 
 

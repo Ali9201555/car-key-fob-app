@@ -1,10 +1,7 @@
 """Persistent manager for the collection of paired vehicles."""
 
-from __future__ import annotations
-
 import csv
 import os
-from typing import Dict, List, Optional
 
 from models.car import Car
 
@@ -12,11 +9,12 @@ from models.car import Car
 class CarManager:
     """Loads, stores, and mutates the collection of paired vehicles.
 
-    The manager is the single source of truth for car state during a run. It
-    reads from and writes to a CSV file so state survives between launches.
+    The manager is the single source of truth for car state during a
+    run. It reads from and writes to a CSV file so state survives
+    between launches.
     """
 
-    CSV_FIELDS: List[str] = [
+    CSV_FIELDS = [
         "plate",
         "make",
         "model",
@@ -34,22 +32,22 @@ class CarManager:
         """Initialize the manager and load any existing data from disk.
 
         Args:
-            csv_path: Absolute path to the CSV file used for persistence. The
-                file is created on first save if it does not exist.
+            csv_path: Absolute path to the CSV file used for persistence.
+                The file is created on first save if it does not exist.
         """
-        self._csv_path: str = csv_path
-        self._cars: Dict[str, Car] = {}
-        self._active_plate: Optional[str] = None
+        self._csv_path = csv_path
+        self._cars = {}
+        self._active_plate = None
         self.load()
 
     def load(self) -> None:
         """Load all cars from disk into memory.
 
-        Missing or empty files are treated as an empty collection. Malformed
-        rows are skipped but do not abort the whole load so a single bad
-        entry cannot lock the user out of their other vehicles.
+        Missing or empty files are treated as an empty collection.
+        Malformed rows are skipped but do not abort the whole load so a
+        single bad entry cannot lock the user out of their other vehicles.
         """
-        self._cars.clear()
+        self._cars = {}
         if not os.path.exists(self._csv_path):
             return
         try:
@@ -60,16 +58,19 @@ class CarManager:
                         car = Car.from_dict(row)
                         self._cars[car.plate] = car
                     except (ValueError, KeyError):
-                        # Skip malformed rows so one corrupt record does not
-                        # hide the rest of the user's garage.
+                        # Skip malformed rows so one corrupt record does
+                        # not hide the rest of the user's garage.
                         continue
         except OSError:
-            # File exists but cannot be read; leave the in-memory list empty
-            # rather than crashing the application.
-            self._cars.clear()
+            # File exists but cannot be read; leave the in-memory list
+            # empty rather than crashing the application.
+            self._cars = {}
 
         if self._cars and self._active_plate not in self._cars:
-            self._active_plate = next(iter(self._cars))
+            # Pick the first car as the active one if none is selected.
+            for plate in self._cars:
+                self._active_plate = plate
+                break
 
     def save(self) -> None:
         """Write the current in-memory state back to the CSV file.
@@ -114,12 +115,16 @@ class CarManager:
         Raises:
             KeyError: If the plate is not registered.
         """
-        plate = plate.strip().upper()
-        if plate not in self._cars:
-            raise KeyError(f"No car paired with plate {plate}.")
-        del self._cars[plate]
-        if self._active_plate == plate:
-            self._active_plate = next(iter(self._cars), None)
+        clean = plate.strip().upper()
+        if clean not in self._cars:
+            raise KeyError(f"No car paired with plate {clean}.")
+        del self._cars[clean]
+        if self._active_plate == clean:
+            # Pick the next available car, or None when the garage is empty.
+            self._active_plate = None
+            for remaining in self._cars:
+                self._active_plate = remaining
+                break
         self.save()
 
     def set_active(self, plate: str) -> None:
@@ -131,18 +136,22 @@ class CarManager:
         Raises:
             KeyError: If the plate is not registered.
         """
-        plate = plate.strip().upper()
-        if plate not in self._cars:
-            raise KeyError(f"No car paired with plate {plate}.")
-        self._active_plate = plate
+        clean = plate.strip().upper()
+        if clean not in self._cars:
+            raise KeyError(f"No car paired with plate {clean}.")
+        self._active_plate = clean
 
-    def get_active(self) -> Optional[Car]:
-        """Return the currently active car, or None if the garage is empty."""
+    def get_active(self):
+        """Return the currently active car, or None when empty.
+
+        Returns:
+            The active Car instance, or None if no cars are paired.
+        """
         if self._active_plate is None:
             return None
         return self._cars.get(self._active_plate)
 
-    def list_cars(self) -> List[Car]:
+    def list_cars(self) -> list:
         """Return all cars in insertion order."""
         return list(self._cars.values())
 

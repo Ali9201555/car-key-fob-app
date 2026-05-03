@@ -1,9 +1,5 @@
 """Dialog that lists recent fob events from the event log."""
 
-from __future__ import annotations
-
-from typing import Optional
-
 from PyQt6.QtWidgets import (
     QDialog,
     QDialogButtonBox,
@@ -25,7 +21,7 @@ class HistoryView(QDialog):
     def __init__(
         self,
         event_log: EventLog,
-        parent: Optional[QWidget] = None,
+        parent: QWidget = None,
     ) -> None:
         """Build the table and populate it from the event log.
 

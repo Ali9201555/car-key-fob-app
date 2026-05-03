@@ -1,9 +1,5 @@
 """Controller for pairing, removing, and switching cars in the garage."""
 
-from __future__ import annotations
-
-from typing import List, Optional
-
 from models.car import Car
 from models.car_manager import CarManager
 from models.event_log import EventLog
@@ -122,12 +118,16 @@ class CarController:
         )
         return active
 
-    def list_cars(self) -> List[Car]:
+    def list_cars(self) -> list:
         """Return all paired cars in insertion order."""
         return self._manager.list_cars()
 
-    def get_active(self) -> Optional[Car]:
-        """Return the currently active car, or None when the garage is empty."""
+    def get_active(self):
+        """Return the currently active car, or None when the garage is empty.
+
+        Returns:
+            The active Car, or None if no cars are paired.
+        """
         return self._manager.get_active()
 
     def save(self) -> None:

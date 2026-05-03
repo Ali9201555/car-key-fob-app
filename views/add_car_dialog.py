@@ -1,9 +1,6 @@
 """Dialog for pairing a new car with the virtual fob."""
 
-from __future__ import annotations
-
 from datetime import date
-from typing import Optional
 
 from PyQt6.QtWidgets import (
     QComboBox,
@@ -26,7 +23,7 @@ class AddCarDialog(QDialog):
     def __init__(
         self,
         car_controller: CarController,
-        parent: Optional[QWidget] = None,
+        parent: QWidget = None,
     ) -> None:
         """Build the form fields and wire up OK/Cancel.
 
@@ -36,7 +33,7 @@ class AddCarDialog(QDialog):
         """
         super().__init__(parent)
         self._controller: CarController = car_controller
-        self._created_car: Optional[Car] = None
+        self._created_car = None
         self.setWindowTitle("Pair New Car")
         self.setModal(True)
         self.setMinimumWidth(340)
@@ -97,6 +94,6 @@ class AddCarDialog(QDialog):
         self._created_car = car
         self.accept()
 
-    def created_car(self) -> Optional[Car]:
+    def created_car(self):
         """Return the car that was paired, or None if the dialog was cancelled."""
         return self._created_car

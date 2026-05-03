@@ -1,7 +1,5 @@
 """State for the virtual fob device itself, independent of any car."""
 
-from __future__ import annotations
-
 import json
 import os
 import random

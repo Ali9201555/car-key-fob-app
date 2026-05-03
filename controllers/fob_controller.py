@@ -1,37 +1,40 @@
 """Controller for the fob button actions (lock, unlock, trunk, panic, etc.)."""
 
-from __future__ import annotations
-
-from dataclasses import dataclass
-
 from models.car_manager import CarManager
 from models.event_log import EventLog
 from models.fob_state import FobState
 
 
-@dataclass
 class FobActionResult:
-    """Outcome of a single fob action, suitable for display in the UI.
+    """Outcome of a single fob action, suitable for display in the UI."""
 
-    Attributes:
-        success: True when the action was accepted and applied.
-        message: Human-readable message to show in the status bar.
-        chirp: True when the UI should play the lock/unlock chirp sound.
-        horn: True when the UI should play the panic horn sound.
-    """
+    def __init__(
+        self,
+        success: bool,
+        message: str,
+        chirp: bool = False,
+        horn: bool = False,
+    ) -> None:
+        """Build a fob action result.
 
-    success: bool
-    message: str
-    chirp: bool = False
-    horn: bool = False
+        Args:
+            success: True when the action was accepted and applied.
+            message: Human-readable message to show in the status bar.
+            chirp: True when the UI should play the lock/unlock chirp.
+            horn: True when the UI should play the panic horn sound.
+        """
+        self.success = success
+        self.message = message
+        self.chirp = chirp
+        self.horn = horn
 
 
 class FobController:
     """Translates button presses into car/fob state mutations and log entries.
 
-    Every public method returns a FobActionResult so the view can surface a
-    uniform success or failure message to the user without inspecting the
-    underlying model state.
+    Every public method returns a FobActionResult so the view can
+    surface a uniform success or failure message to the user without
+    inspecting the underlying model state.
     """
 
     def __init__(
@@ -47,11 +50,11 @@ class FobController:
             fob_state: The FobState model tracking battery and signal.
             event_log: The EventLog that records every button press.
         """
-        self._manager: CarManager = car_manager
-        self._fob: FobState = fob_state
-        self._log: EventLog = event_log
+        self._manager = car_manager
+        self._fob = fob_state
+        self._log = event_log
 
-    def _preflight(self) -> FobActionResult | None:
+    def _preflight(self):
         """Check conditions that would block any action.
 
         Returns:
@@ -79,7 +82,8 @@ class FobController:
         """
         self._fob.apply_action(action)
         self._manager.save()
-        plate = self._manager.get_active().plate if self._manager.get_active() else ""
+        active = self._manager.get_active()
+        plate = active.plate if active is not None else ""
         self._log.record(plate=plate, action=action, detail=detail)
 
     def lock(self) -> FobActionResult:
@@ -93,8 +97,6 @@ class FobController:
             return blocked
 
         car = self._manager.get_active()
-        assert car is not None  # preflight guarantees a car exists
-
         if car.locked and not car.trunk_open:
             return FobActionResult(
                 success=False,
@@ -121,8 +123,6 @@ class FobController:
             return blocked
 
         car = self._manager.get_active()
-        assert car is not None
-
         if not car.locked:
             return FobActionResult(
                 success=False,
@@ -148,17 +148,12 @@ class FobController:
             return blocked
 
         car = self._manager.get_active()
-        assert car is not None
-
         car.trunk_open = not car.trunk_open
         # Opening the trunk auto-unlocks the car to match real behavior.
         if car.trunk_open:
             car.locked = False
         state_text = "opened" if car.trunk_open else "closed"
-        self._commit(
-            "TRUNK",
-            f"Trunk {state_text} on {car.display_name}",
-        )
+        self._commit("TRUNK", f"Trunk {state_text} on {car.display_name}")
         return FobActionResult(
             success=True,
             message=f"Trunk {state_text}.",
@@ -188,8 +183,6 @@ class FobController:
             return blocked
 
         car = self._manager.get_active()
-        assert car is not None
-
         car.panic_active = not car.panic_active
         state_text = "started" if car.panic_active else "silenced"
         self._commit(
@@ -206,13 +199,13 @@ class FobController:
         """Start or stop the engine remotely.
 
         Args:
-            authenticated: True when the caller has verified the owner PIN.
-                Remote start is PIN-protected because it leaves the car
-                running while unattended.
+            authenticated: True when the caller has verified the owner
+                PIN. Remote start is PIN-protected because it leaves the
+                car running while unattended.
 
         Returns:
-            A FobActionResult reporting whether the engine was started or
-            stopped.
+            A FobActionResult reporting whether the engine was started
+            or stopped.
         """
         if not authenticated:
             return FobActionResult(
@@ -225,8 +218,6 @@ class FobController:
             return blocked
 
         car = self._manager.get_active()
-        assert car is not None
-
         if not car.engine_running and car.fuel_level < 5.0:
             return FobActionResult(
                 success=False,
@@ -236,10 +227,7 @@ class FobController:
         car.engine_running = not car.engine_running
         action = "REMOTE_START" if car.engine_running else "REMOTE_STOP"
         state_text = "started" if car.engine_running else "stopped"
-        self._commit(
-            action,
-            f"Engine {state_text} on {car.display_name}",
-        )
+        self._commit(action, f"Engine {state_text} on {car.display_name}")
         return FobActionResult(
             success=True,
             message=f"Engine {state_text}.",
@@ -253,7 +241,11 @@ class FobController:
             A success FobActionResult showing a confirmation message.
         """
         self._fob.replace_battery()
-        self._log.record(plate="", action="BATTERY", detail="Fob battery replaced")
+        self._log.record(
+            plate="",
+            action="BATTERY",
+            detail="Fob battery replaced",
+        )
         return FobActionResult(
             success=True,
             message="Fob battery replaced. 100% charge.",

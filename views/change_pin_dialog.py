@@ -1,9 +1,5 @@
 """Dialog letting the owner change their stored PIN."""
 
-from __future__ import annotations
-
-from typing import Optional
-
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QDialog,
@@ -23,7 +19,7 @@ class ChangePinDialog(QDialog):
     def __init__(
         self,
         auth_controller: AuthController,
-        parent: Optional[QWidget] = None,
+        parent: QWidget = None,
     ) -> None:
         """Lay out the three password fields and OK/Cancel buttons.
 

@@ -1,79 +1,55 @@
-"""PIN-based authentication for privileged key fob operations."""
+"""PIN-based authentication for privileged key fob operations.
 
-from __future__ import annotations
+The owner's PIN guards the panic alarm and remote-start buttons. The
+PIN is stored in a plain text file beside the other data files.
+"""
 
-import hashlib
 import os
-import secrets
-from typing import Optional
 
 
 class UserAuth:
-    """Manages the owner's PIN for operations like panic and remote start.
+    """Manages the owner's PIN for operations like panic and remote start."""
 
-    The PIN is never written to disk in clear text. A random per-install
-    salt is generated on first use, and only the SHA-256 hash of
-    salt + PIN is persisted. This matches how a real fob pairs to a user
-    account.
-    """
-
-    DEFAULT_PIN: str = "1234"
-    PIN_LENGTH: int = 4
-    MAX_ATTEMPTS: int = 3
+    DEFAULT_PIN = "1234"
+    PIN_LENGTH = 4
+    MAX_ATTEMPTS = 3
 
     def __init__(self, auth_path: str) -> None:
-        """Load the stored credential, creating a default one if needed.
+        """Load the stored PIN, creating the default one if needed.
 
         Args:
             auth_path: Absolute path to the credential file.
         """
-        self._auth_path: str = auth_path
-        self._salt: str = ""
-        self._pin_hash: str = ""
-        self._failed_attempts: int = 0
+        self._auth_path = auth_path
+        self._stored_pin = ""
+        self._failed_attempts = 0
         self._load_or_initialize()
 
     def _load_or_initialize(self) -> None:
-        """Read credentials from disk or seed them with the default PIN."""
+        """Read the stored PIN, or seed it with the default 1234."""
         if os.path.exists(self._auth_path):
             try:
                 with open(self._auth_path, "r", encoding="utf-8") as handle:
-                    lines = handle.read().splitlines()
-                if len(lines) >= 2 and lines[0] and lines[1]:
-                    self._salt = lines[0]
-                    self._pin_hash = lines[1]
+                    saved = handle.read().strip()
+                if saved:
+                    self._stored_pin = saved
                     return
             except OSError:
-                # Fall through to re-initialization below.
+                # Fall through and re-create the file with the default PIN.
                 pass
-        self._salt = secrets.token_hex(16)
-        self._pin_hash = self._hash_pin(self.DEFAULT_PIN)
+        self._stored_pin = self.DEFAULT_PIN
         self._save()
 
     def _save(self) -> None:
-        """Persist the salt and current PIN hash to disk."""
+        """Persist the current PIN to disk."""
         directory = os.path.dirname(self._auth_path)
         if directory:
             os.makedirs(directory, exist_ok=True)
         with open(self._auth_path, "w", encoding="utf-8") as handle:
-            handle.write(f"{self._salt}\n{self._pin_hash}\n")
-
-    def _hash_pin(self, pin: str) -> str:
-        """Compute the SHA-256 hash of salt + pin.
-
-        Args:
-            pin: The clear text PIN entered by the user.
-
-        Returns:
-            The hexadecimal digest as a string.
-        """
-        digest = hashlib.sha256()
-        digest.update(self._salt.encode("utf-8"))
-        digest.update(pin.encode("utf-8"))
-        return digest.hexdigest()
+            handle.write(self._stored_pin)
 
     @staticmethod
-    def validate_pin_format(pin: Optional[str]) -> str:
+    def validate_pin_format(pin: str) -> str:
         """Validate the shape of a PIN string coming from the UI.
 
         Args:
@@ -83,41 +59,38 @@ class UserAuth:
             The validated PIN, stripped of surrounding whitespace.
 
         Raises:
-            ValueError: If the PIN is empty, too short, too long, or
+            ValueError: If the PIN is empty, the wrong length, or
                 contains non-digit characters.
         """
         if pin is None:
             raise ValueError("PIN is required.")
-        pin = pin.strip()
-        if len(pin) != UserAuth.PIN_LENGTH:
+        clean = pin.strip()
+        if len(clean) != UserAuth.PIN_LENGTH:
             raise ValueError(
                 f"PIN must be exactly {UserAuth.PIN_LENGTH} digits."
             )
-        if not pin.isdigit():
+        if not clean.isdigit():
             raise ValueError("PIN must contain only digits 0-9.")
-        return pin
+        return clean
 
     def verify(self, pin: str) -> bool:
-        """Check whether the supplied PIN matches the stored credential.
+        """Check whether the supplied PIN matches the stored one.
 
         Args:
             pin: The clear text PIN entered by the user.
 
         Returns:
             True when the PIN matches, False otherwise. On mismatch the
-            internal failed-attempt counter is incremented; callers should
-            check ``is_locked_out`` after a failure.
+            internal failed-attempt counter is incremented; callers
+            should check ``is_locked_out`` after a failure.
         """
         try:
-            pin = self.validate_pin_format(pin)
+            clean = self.validate_pin_format(pin)
         except ValueError:
             self._failed_attempts += 1
             return False
 
-        candidate = self._hash_pin(pin)
-        # secrets.compare_digest protects against timing attacks when
-        # comparing two equal-length hex digests.
-        if secrets.compare_digest(candidate, self._pin_hash):
+        if clean == self._stored_pin:
             self._failed_attempts = 0
             return True
         self._failed_attempts += 1
@@ -136,8 +109,8 @@ class UserAuth:
         """
         if not self.verify(old_pin):
             raise PermissionError("Current PIN is incorrect.")
-        new_pin = self.validate_pin_format(new_pin)
-        self._pin_hash = self._hash_pin(new_pin)
+        clean_new = self.validate_pin_format(new_pin)
+        self._stored_pin = clean_new
         self._failed_attempts = 0
         self._save()
 
@@ -152,5 +125,5 @@ class UserAuth:
         return self._failed_attempts >= self.MAX_ATTEMPTS
 
     def reset_attempts(self) -> None:
-        """Clear the failed-attempt counter, e.g. after a timed cooldown."""
+        """Clear the failed-attempt counter."""
         self._failed_attempts = 0

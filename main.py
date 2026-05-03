@@ -7,8 +7,6 @@ The launcher wires every model, controller, and view together and then
 hands control to the Qt event loop.
 """
 
-from __future__ import annotations
-
 import os
 import sys
 import traceback

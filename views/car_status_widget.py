@@ -1,9 +1,5 @@
 """Widget that renders the active car with live status indicators."""
 
-from __future__ import annotations
-
-from typing import Optional
-
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor, QPainter, QPaintEvent, QPen, QBrush, QFont
 from PyQt6.QtWidgets import QWidget
@@ -30,18 +26,18 @@ class CarStatusWidget(QWidget):
         "Yellow": "#f1c40f",
     }
 
-    def __init__(self, parent: Optional[QWidget] = None) -> None:
+    def __init__(self, parent: QWidget = None) -> None:
         """Initialize the widget with no active car.
 
         Args:
             parent: Optional parent widget.
         """
         super().__init__(parent)
-        self._car: Optional[Car] = None
-        self._panic_flash: bool = False
+        self._car = None
+        self._panic_flash = False
         self.setMinimumSize(380, 220)
 
-    def set_car(self, car: Optional[Car]) -> None:
+    def set_car(self, car) -> None:
         """Change which car is currently rendered.
 
         Args:

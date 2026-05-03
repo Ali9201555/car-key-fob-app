@@ -1,33 +1,40 @@
 """Timestamped event log for key fob activity."""
 
-from __future__ import annotations
-
 import csv
 import os
-from dataclasses import dataclass
 from datetime import datetime
-from typing import List
 
 
-@dataclass
 class FobEvent:
-    """A single recorded event such as a lock, unlock, or panic press.
+    """A single recorded event such as a lock, unlock, or panic press."""
 
-    Attributes:
-        timestamp: ISO-8601 formatted local time when the event occurred.
-        plate: License plate of the car involved, or an empty string for
-            fob-level events such as "Fob battery replaced".
-        action: Short label describing what happened (e.g. "LOCK", "UNLOCK").
-        detail: Free-form description of the event for the history view.
-    """
+    def __init__(
+        self,
+        timestamp: str,
+        plate: str,
+        action: str,
+        detail: str,
+    ) -> None:
+        """Build a fob event record.
 
-    timestamp: str
-    plate: str
-    action: str
-    detail: str
+        Args:
+            timestamp: ISO-8601 formatted local time when the event happened.
+            plate: License plate of the car involved (or empty for fob-level
+                events such as battery replacement).
+            action: Short uppercase action label (e.g. ``"LOCK"``).
+            detail: Free-form description shown in the history view.
+        """
+        self.timestamp = timestamp
+        self.plate = plate
+        self.action = action
+        self.detail = detail
 
     def to_dict(self) -> dict:
-        """Serialize the event for CSV storage."""
+        """Serialize the event for CSV storage.
+
+        Returns:
+            A dictionary keyed by CSV column name.
+        """
         return {
             "timestamp": self.timestamp,
             "plate": self.plate,
@@ -39,8 +46,8 @@ class FobEvent:
 class EventLog:
     """Append-only log of fob events, persisted to a CSV file."""
 
-    CSV_FIELDS: List[str] = ["timestamp", "plate", "action", "detail"]
-    MAX_EVENTS: int = 500  # Keep the log bounded to avoid unbounded growth.
+    CSV_FIELDS = ["timestamp", "plate", "action", "detail"]
+    MAX_EVENTS = 500  # Keep the log bounded to avoid unbounded growth.
 
     def __init__(self, csv_path: str) -> None:
         """Load the existing log or create a fresh in-memory list.
@@ -48,8 +55,8 @@ class EventLog:
         Args:
             csv_path: Absolute path to the event log CSV file.
         """
-        self._csv_path: str = csv_path
-        self._events: List[FobEvent] = []
+        self._csv_path = csv_path
+        self._events = []
         self._load()
 
     def _load(self) -> None:
@@ -105,7 +112,7 @@ class EventLog:
         self._events.append(event)
         # Keep the log bounded; drop the oldest entries when over the cap.
         if len(self._events) > self.MAX_EVENTS:
-            self._events = self._events[-self.MAX_EVENTS :]
+            self._events = self._events[-self.MAX_EVENTS:]
         try:
             self._save()
         except OSError:
@@ -114,7 +121,7 @@ class EventLog:
             pass
         return event
 
-    def recent(self, limit: int = 50) -> List[FobEvent]:
+    def recent(self, limit: int = 50) -> list:
         """Return the most recent events, newest first.
 
         Args:
@@ -125,11 +132,14 @@ class EventLog:
         """
         if limit <= 0:
             return []
-        return list(reversed(self._events[-limit:]))
+        recent_events = self._events[-limit:]
+        recent_events = list(recent_events)
+        recent_events.reverse()
+        return recent_events
 
     def clear(self) -> None:
         """Erase the entire event history and persist the change."""
-        self._events.clear()
+        self._events = []
         try:
             self._save()
         except OSError:

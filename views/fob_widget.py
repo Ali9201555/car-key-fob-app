@@ -1,9 +1,5 @@
 """The interactive virtual key fob widget with five action buttons."""
 
-from __future__ import annotations
-
-from typing import Optional
-
 from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtWidgets import (
     QFrame,
@@ -29,7 +25,7 @@ class FobWidget(QFrame):
     panic_pressed = pyqtSignal()
     remote_start_pressed = pyqtSignal()
 
-    def __init__(self, parent: Optional[QWidget] = None) -> None:
+    def __init__(self, parent: QWidget = None) -> None:
         """Create every button and the battery/signal indicators.
 
         Args:
