@@ -380,7 +380,7 @@ class MainWindow(QMainWindow):
         it that way; we override it to flush state on shutdown.
         """
         try:
-            self._car_ctrl.save()
+            self._car_ctrl.write()
         except OSError:
             # Saving is best-effort on shutdown; we still allow close.
             pass

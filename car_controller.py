@@ -136,6 +136,6 @@ class CarController:
         """
         return self._manager.get_active()
 
-    def save(self) -> None:
+    def write(self) -> None:
         """Persist any mutations made to car state."""
-        self._manager.save()
+        self._manager.write()

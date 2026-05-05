@@ -70,7 +70,7 @@ class FobState:
                 # Skip a malformed value but keep the rest of the file.
                 continue
 
-    def _save(self) -> None:
+    def _write(self) -> None:
         """Persist the current state to disk."""
         try:
             with open(self._state_path, "w", encoding="utf-8") as handle:
@@ -92,12 +92,12 @@ class FobState:
         self._battery = max(0.0, self._battery - cost)
         # Simulated radio signal bars fluctuate each time the fob transmits.
         self._signal_bars = random.randint(2, 4)
-        self._save()
+        self._write()
 
     def replace_battery(self) -> None:
         """Return the battery to full charge, as if a fresh coin cell was inserted."""
         self._battery = self.STARTING_BATTERY
-        self._save()
+        self._write()
 
     def get_battery(self) -> float:
         """Return the current battery level as a percentage."""

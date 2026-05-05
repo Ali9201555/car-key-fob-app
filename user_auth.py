@@ -37,9 +37,9 @@ class UserAuth:
             # Fall through and re-create the file with the default PIN.
             pass
         self._stored_pin = self.DEFAULT_PIN
-        self._save()
+        self._write()
 
-    def _save(self) -> None:
+    def _write(self) -> None:
         """Persist the current PIN to disk."""
         with open(self._auth_path, "w", encoding="utf-8") as handle:
             handle.write(self._stored_pin)
@@ -107,7 +107,7 @@ class UserAuth:
         clean_new = self.validate_pin_format(new_pin)
         self._stored_pin = clean_new
         self._failed_attempts = 0
-        self._save()
+        self._write()
 
     def get_failed_attempts(self) -> int:
         """Return how many consecutive wrong PINs have been entered."""

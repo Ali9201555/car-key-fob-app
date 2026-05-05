@@ -81,7 +81,7 @@ class FobController:
             detail: Descriptive text for the history view.
         """
         self._fob.apply_action(action)
-        self._manager.save()
+        self._manager.write()
         active = self._manager.get_active()
         plate = active.plate if active is not None else ""
         self._log.record(plate=plate, action=action, detail=detail)

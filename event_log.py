@@ -87,7 +87,7 @@ class EventLog:
         if self._events:
             self._next_sequence = self._events[-1].sequence + 1
 
-    def _save(self) -> None:
+    def _write(self) -> None:
         """Persist the current in-memory event list to disk."""
         with open(self._csv_path, "w", newline="", encoding="utf-8") as handle:
             writer = csv.DictWriter(handle, fieldnames=self.CSV_FIELDS)
@@ -118,7 +118,7 @@ class EventLog:
         if len(self._events) > self.MAX_EVENTS:
             self._events = self._events[-self.MAX_EVENTS:]
         try:
-            self._save()
+            self._write()
         except OSError:
             # Logging must never crash the caller; worst case we keep the
             # event in memory for this session only.
@@ -145,6 +145,6 @@ class EventLog:
         """Erase the entire event history and persist the change."""
         self._events = []
         try:
-            self._save()
+            self._write()
         except OSError:
             pass

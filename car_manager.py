@@ -73,7 +73,7 @@ class CarManager:
                 self._active_plate = plate
                 break
 
-    def save(self) -> None:
+    def write(self) -> None:
         """Write the current in-memory state back to the CSV file.
 
         The ``data`` directory is committed to the repository, so the
@@ -105,7 +105,7 @@ class CarManager:
         self._cars[car.plate] = car
         if self._active_plate is None:
             self._active_plate = car.plate
-        self.save()
+        self.write()
 
     def remove_car(self, plate: str) -> None:
         """Remove a car by license plate.
@@ -126,7 +126,7 @@ class CarManager:
             for remaining in self._cars:
                 self._active_plate = remaining
                 break
-        self.save()
+        self.write()
 
     def set_active(self, plate: str) -> None:
         """Mark which car is currently selected in the UI.
