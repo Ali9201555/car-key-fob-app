@@ -103,30 +103,30 @@ class Car:
             "odometer": str(self.odometer),
         }
 
-    @classmethod
-    def from_dict(cls, row: dict) -> "Car":
-        """Build a Car from a CSV row dictionary.
 
-        Args:
-            row: Mapping of CSV column name to stringified value.
+def make_car_from_dict(row: dict) -> Car:
+    """Build a Car from a CSV row dictionary.
 
-        Returns:
-            A fully validated Car instance.
+    Args:
+        row: Mapping of CSV column name to stringified value.
 
-        Raises:
-            KeyError: If a required column is missing from the row.
-            ValueError: If any value cannot be coerced or fails validation.
-        """
-        return cls(
-            plate=row["plate"],
-            make=row["make"],
-            model=row["model"],
-            year=int(row["year"]),
-            color=row.get("color", "Silver"),
-            locked=row.get("locked", "True") == "True",
-            trunk_open=row.get("trunk_open", "False") == "True",
-            engine_running=row.get("engine_running", "False") == "True",
-            panic_active=row.get("panic_active", "False") == "True",
-            fuel_level=float(row.get("fuel_level", "75.0")),
-            odometer=int(row.get("odometer", "0")),
-        )
+    Returns:
+        A fully validated Car instance.
+
+    Raises:
+        KeyError: If a required column is missing from the row.
+        ValueError: If any value cannot be coerced or fails validation.
+    """
+    return Car(
+        plate=row["plate"],
+        make=row["make"],
+        model=row["model"],
+        year=int(row["year"]),
+        color=row.get("color", "Silver"),
+        locked=row.get("locked", "True") == "True",
+        trunk_open=row.get("trunk_open", "False") == "True",
+        engine_running=row.get("engine_running", "False") == "True",
+        panic_active=row.get("panic_active", "False") == "True",
+        fuel_level=float(row.get("fuel_level", "75.0")),
+        odometer=int(row.get("odometer", "0")),
+    )

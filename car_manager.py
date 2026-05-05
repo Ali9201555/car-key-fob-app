@@ -3,7 +3,7 @@
 import csv
 import os
 
-from car import Car
+from car import Car, make_car_from_dict
 
 
 class CarManager:
@@ -55,7 +55,7 @@ class CarManager:
                 reader = csv.DictReader(handle)
                 for row in reader:
                     try:
-                        car = Car.from_dict(row)
+                        car = make_car_from_dict(row)
                         self._cars[car.plate] = car
                     except (ValueError, KeyError):
                         # Skip malformed rows so one corrupt record does

@@ -48,8 +48,7 @@ class UserAuth:
         with open(self._auth_path, "w", encoding="utf-8") as handle:
             handle.write(self._stored_pin)
 
-    @staticmethod
-    def validate_pin_format(pin: str) -> str:
+    def validate_pin_format(self, pin: str) -> str:
         """Validate the shape of a PIN string coming from the UI.
 
         Args:
@@ -65,9 +64,9 @@ class UserAuth:
         if pin is None:
             raise ValueError("PIN is required.")
         clean = pin.strip()
-        if len(clean) != UserAuth.PIN_LENGTH:
+        if len(clean) != self.PIN_LENGTH:
             raise ValueError(
-                f"PIN must be exactly {UserAuth.PIN_LENGTH} digits."
+                f"PIN must be exactly {self.PIN_LENGTH} digits."
             )
         if not clean.isdigit():
             raise ValueError("PIN must contain only digits 0-9.")
