@@ -194,7 +194,7 @@ class MainWindow(QMainWindow):
             if new_car is not None:
                 self._select_plate(new_car.plate)
             self._refresh_active_car()
-            self._set_status(f"Paired {new_car.display_name}.")
+            self._set_status(f"Paired {new_car.get_display_name()}.")
 
     def _on_remove_car(self) -> None:
         """Remove the active car after a confirmation prompt."""
@@ -209,7 +209,7 @@ class MainWindow(QMainWindow):
         reply = QMessageBox.question(
             self,
             "Remove car",
-            f"Remove {car.display_name} from the fob?",
+            f"Remove {car.get_display_name()} from the fob?",
         )
         if reply != QMessageBox.StandardButton.Yes:
             return
@@ -220,7 +220,7 @@ class MainWindow(QMainWindow):
             return
         self._refresh_car_dropdown()
         self._refresh_active_car()
-        self._set_status(f"Removed {car.display_name}.")
+        self._set_status(f"Removed {car.get_display_name()}.")
 
     def _on_show_history(self) -> None:
         """Open the history dialog."""
@@ -320,7 +320,7 @@ class MainWindow(QMainWindow):
         self._car_selector.blockSignals(True)
         self._car_selector.clear()
         for car in self._car_ctrl.list_cars():
-            self._car_selector.addItem(car.display_name, car.plate)
+            self._car_selector.addItem(car.get_display_name(), car.plate)
         active = self._car_ctrl.get_active()
         if active is not None:
             self._select_plate(active.plate)
@@ -341,21 +341,21 @@ class MainWindow(QMainWindow):
             self._car_detail_label.setText("No car paired.")
             self._fob.set_enabled_buttons(False)
         else:
-            self._car_detail_label.setText(car.display_name)
+            self._car_detail_label.setText(car.get_display_name())
             self._fob.set_enabled_buttons(True)
         self._update_panic_timer()
 
     def _refresh_fob_indicators(self) -> None:
         """Sync the fob battery bar and signal indicator with the model."""
-        self._fob.update_battery(self._fob_state.battery)
-        self._fob.update_signal(self._fob_state.signal_bars)
+        self._fob.update_battery(self._fob_state.get_battery())
+        self._fob.update_signal(self._fob_state.get_signal_bars())
 
-        if self._fob_state.is_critical_battery:
+        if self._fob_state.is_critical_battery():
             self.statusBar().setStyleSheet("color: #ff4d4d;")
             self._set_status(
                 "Fob battery critical! Replace the battery in Tools."
             )
-        elif self._fob_state.is_low_battery:
+        elif self._fob_state.is_low_battery():
             self.statusBar().setStyleSheet("color: #ffb84d;")
 
     def _update_panic_timer(self) -> None:

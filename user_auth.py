@@ -114,12 +114,10 @@ class UserAuth:
         self._failed_attempts = 0
         self._save()
 
-    @property
-    def failed_attempts(self) -> int:
+    def get_failed_attempts(self) -> int:
         """Return how many consecutive wrong PINs have been entered."""
         return self._failed_attempts
 
-    @property
     def is_locked_out(self) -> bool:
         """Return True once the maximum failed attempts have been reached."""
         return self._failed_attempts >= self.MAX_ATTEMPTS

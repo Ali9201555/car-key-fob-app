@@ -98,27 +98,22 @@ class FobState:
         self._battery = self.STARTING_BATTERY
         self._save()
 
-    @property
-    def battery(self) -> float:
+    def get_battery(self) -> float:
         """Return the current battery level as a percentage."""
         return self._battery
 
-    @property
-    def signal_bars(self) -> int:
+    def get_signal_bars(self) -> int:
         """Return the most recent simulated signal strength (0-4 bars)."""
         return self._signal_bars
 
-    @property
     def is_low_battery(self) -> bool:
-        """True when battery is under the warning threshold."""
+        """Return True when battery is under the warning threshold."""
         return self._battery <= self.LOW_BATTERY_THRESHOLD
 
-    @property
     def is_critical_battery(self) -> bool:
-        """True when battery is dangerously low and actions may misfire."""
+        """Return True when battery is dangerously low and actions may misfire."""
         return self._battery <= self.CRITICAL_BATTERY_THRESHOLD
 
-    @property
     def is_dead(self) -> bool:
-        """True when the battery has no remaining charge."""
+        """Return True when the battery has no remaining charge."""
         return self._battery <= 0.0

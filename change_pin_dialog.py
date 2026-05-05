@@ -51,8 +51,7 @@ class ChangePinDialog(QDialog):
         buttons.rejected.connect(self.reject)
         form.addRow(buttons)
 
-    @staticmethod
-    def _make_pin_edit() -> QLineEdit:
+    def _make_pin_edit(self) -> QLineEdit:
         """Build one of the three password-mode PIN fields."""
         edit = QLineEdit()
         edit.setEchoMode(QLineEdit.EchoMode.Password)

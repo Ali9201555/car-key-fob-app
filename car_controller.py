@@ -70,7 +70,7 @@ class CarController:
         self._log.record(
             plate=car.plate,
             action="PAIR",
-            detail=f"Paired {car.display_name}",
+            detail=f"Paired {car.get_display_name()}",
         )
         return car
 
@@ -84,12 +84,18 @@ class CarController:
             KeyError: If the plate is not registered.
         """
         plate = (plate or "").strip().upper()
-        car = next(
-            (c for c in self._manager.list_cars() if c.plate == plate),
-            None,
-        )
+        # Look up the car (so we can use its display name in the log) before
+        # the manager removes it.
+        car = None
+        for candidate in self._manager.list_cars():
+            if candidate.plate == plate:
+                car = candidate
+                break
         self._manager.remove_car(plate)
-        detail = f"Removed {car.display_name}" if car else f"Removed {plate}"
+        if car is not None:
+            detail = f"Removed {car.get_display_name()}"
+        else:
+            detail = f"Removed {plate}"
         self._log.record(plate=plate, action="UNPAIR", detail=detail)
 
     def switch_active(self, plate: str) -> Car:
@@ -114,7 +120,7 @@ class CarController:
         self._log.record(
             plate=active.plate,
             action="SWITCH",
-            detail=f"Active car set to {active.display_name}",
+            detail=f"Active car set to {active.get_display_name()}",
         )
         return active
 

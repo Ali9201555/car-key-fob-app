@@ -79,8 +79,7 @@ class Car:
         if self.odometer < 0:
             raise ValueError("Odometer cannot be negative.")
 
-    @property
-    def display_name(self) -> str:
+    def get_display_name(self) -> str:
         """Return a human readable one-line label for the vehicle."""
         return f"{self.year} {self.make} {self.model} ({self.plate})"
 

@@ -53,11 +53,11 @@ class AuthController:
 
     def remaining_attempts(self) -> int:
         """Return how many PIN attempts are left before the lockout kicks in."""
-        return max(0, UserAuth.MAX_ATTEMPTS - self._auth.failed_attempts)
+        return max(0, UserAuth.MAX_ATTEMPTS - self._auth.get_failed_attempts())
 
     def is_locked_out(self) -> bool:
         """True when the auth model has hit the failed-attempt cap."""
-        return self._auth.is_locked_out
+        return self._auth.is_locked_out()
 
     def reset_attempts(self) -> None:
         """Clear the failed attempt counter after a lockout cooldown."""

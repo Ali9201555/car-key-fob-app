@@ -66,7 +66,7 @@ class FobController:
                 success=False,
                 message="No cars paired. Add a car before using the fob.",
             )
-        if self._fob.is_dead:
+        if self._fob.is_dead():
             return FobActionResult(
                 success=False,
                 message="Fob battery is dead. Replace the battery first.",
@@ -100,15 +100,15 @@ class FobController:
         if car.locked and not car.trunk_open:
             return FobActionResult(
                 success=False,
-                message=f"{car.display_name} is already locked.",
+                message=f"{car.get_display_name()} is already locked.",
             )
 
         car.locked = True
         car.trunk_open = False
-        self._commit("LOCK", f"Locked {car.display_name}")
+        self._commit("LOCK", f"Locked {car.get_display_name()}")
         return FobActionResult(
             success=True,
-            message=f"Locked {car.display_name}.",
+            message=f"Locked {car.get_display_name()}.",
             chirp=True,
         )
 
@@ -126,14 +126,14 @@ class FobController:
         if not car.locked:
             return FobActionResult(
                 success=False,
-                message=f"{car.display_name} is already unlocked.",
+                message=f"{car.get_display_name()} is already unlocked.",
             )
 
         car.locked = False
-        self._commit("UNLOCK", f"Unlocked {car.display_name}")
+        self._commit("UNLOCK", f"Unlocked {car.get_display_name()}")
         return FobActionResult(
             success=True,
-            message=f"Unlocked {car.display_name}.",
+            message=f"Unlocked {car.get_display_name()}.",
             chirp=True,
         )
 
@@ -153,7 +153,7 @@ class FobController:
         if car.trunk_open:
             car.locked = False
         state_text = "opened" if car.trunk_open else "closed"
-        self._commit("TRUNK", f"Trunk {state_text} on {car.display_name}")
+        self._commit("TRUNK", f"Trunk {state_text} on {car.get_display_name()}")
         return FobActionResult(
             success=True,
             message=f"Trunk {state_text}.",
@@ -187,7 +187,7 @@ class FobController:
         state_text = "started" if car.panic_active else "silenced"
         self._commit(
             "PANIC",
-            f"Panic alarm {state_text} on {car.display_name}",
+            f"Panic alarm {state_text} on {car.get_display_name()}",
         )
         return FobActionResult(
             success=True,
@@ -227,7 +227,7 @@ class FobController:
         car.engine_running = not car.engine_running
         action = "REMOTE_START" if car.engine_running else "REMOTE_STOP"
         state_text = "started" if car.engine_running else "stopped"
-        self._commit(action, f"Engine {state_text} on {car.display_name}")
+        self._commit(action, f"Engine {state_text} on {car.get_display_name()}")
         return FobActionResult(
             success=True,
             message=f"Engine {state_text}.",
