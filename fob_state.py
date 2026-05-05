@@ -1,6 +1,5 @@
 """State for the virtual fob device itself, independent of any car."""
 
-import os
 import random
 
 
@@ -46,31 +45,33 @@ class FobState:
 
     def _load(self) -> None:
         """Read the stored state, tolerating corrupt or missing files."""
-        if not os.path.exists(self._state_path):
+        try:
+            handle = open(self._state_path, "r", encoding="utf-8")
+        except FileNotFoundError:
+            return
+        except OSError:
             return
         try:
-            with open(self._state_path, "r", encoding="utf-8") as handle:
-                lines = handle.read().splitlines()
-            for line in lines:
-                if "=" not in line:
-                    continue
-                key, value = line.split("=", 1)
-                key = key.strip()
-                value = value.strip()
+            lines = handle.read().splitlines()
+        finally:
+            handle.close()
+        for line in lines:
+            if "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            key = key.strip()
+            value = value.strip()
+            try:
                 if key == "battery":
                     self._battery = float(value)
                 elif key == "signal_bars":
                     self._signal_bars = int(value)
-        except (OSError, ValueError):
-            # Fall back to defaults if the file is unreadable.
-            self._battery = self.STARTING_BATTERY
-            self._signal_bars = 4
+            except ValueError:
+                # Skip a malformed value but keep the rest of the file.
+                continue
 
     def _save(self) -> None:
         """Persist the current state to disk."""
-        directory = os.path.dirname(self._state_path)
-        if directory:
-            os.makedirs(directory, exist_ok=True)
         try:
             with open(self._state_path, "w", encoding="utf-8") as handle:
                 handle.write(f"battery={self._battery}\n")

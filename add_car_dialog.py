@@ -1,7 +1,5 @@
 """Dialog for pairing a new car with the virtual fob."""
 
-from datetime import date
-
 from PyQt6.QtWidgets import (
     QComboBox,
     QDialog,
@@ -53,9 +51,11 @@ class AddCarDialog(QDialog):
         self._model_edit.setPlaceholderText("Camry")
         form.addRow("Model:", self._model_edit)
 
+        # Default the year spinner to a recent model year. The user can
+        # change this to any value from 1900 to 2100.
         self._year_spin = QSpinBox()
         self._year_spin.setRange(1900, 2100)
-        self._year_spin.setValue(date.today().year)
+        self._year_spin.setValue(2024)
         form.addRow("Year:", self._year_spin)
 
         self._color_combo = QComboBox()

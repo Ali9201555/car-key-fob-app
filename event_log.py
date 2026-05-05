@@ -1,8 +1,6 @@
-"""Timestamped event log for key fob activity."""
+"""Numbered event log for key fob activity."""
 
 import csv
-import os
-from datetime import datetime
 
 
 class FobEvent:
@@ -10,7 +8,7 @@ class FobEvent:
 
     def __init__(
         self,
-        timestamp: str,
+        sequence: int,
         plate: str,
         action: str,
         detail: str,
@@ -18,13 +16,14 @@ class FobEvent:
         """Build a fob event record.
 
         Args:
-            timestamp: ISO-8601 formatted local time when the event happened.
-            plate: License plate of the car involved (or empty for fob-level
-                events such as battery replacement).
+            sequence: Auto-incrementing event number; the first event
+                stored is 1, the second is 2, and so on.
+            plate: License plate of the car involved (or empty for
+                fob-level events such as battery replacement).
             action: Short uppercase action label (e.g. ``"LOCK"``).
             detail: Free-form description shown in the history view.
         """
-        self.timestamp = timestamp
+        self.sequence = sequence
         self.plate = plate
         self.action = action
         self.detail = detail
@@ -36,7 +35,7 @@ class FobEvent:
             A dictionary keyed by CSV column name.
         """
         return {
-            "timestamp": self.timestamp,
+            "sequence": str(self.sequence),
             "plate": self.plate,
             "action": self.action,
             "detail": self.detail,
@@ -46,46 +45,50 @@ class FobEvent:
 class EventLog:
     """Append-only log of fob events, persisted to a CSV file."""
 
-    CSV_FIELDS = ["timestamp", "plate", "action", "detail"]
+    CSV_FIELDS = ["sequence", "plate", "action", "detail"]
     MAX_EVENTS = 500  # Keep the log bounded to avoid unbounded growth.
 
     def __init__(self, csv_path: str) -> None:
         """Load the existing log or create a fresh in-memory list.
 
         Args:
-            csv_path: Absolute path to the event log CSV file.
+            csv_path: Path to the event log CSV file.
         """
         self._csv_path = csv_path
         self._events = []
+        self._next_sequence = 1
         self._load()
 
     def _load(self) -> None:
         """Read existing events from disk, ignoring malformed rows."""
-        if not os.path.exists(self._csv_path):
-            return
         try:
-            with open(self._csv_path, "r", newline="", encoding="utf-8") as handle:
-                reader = csv.DictReader(handle)
-                for row in reader:
-                    try:
-                        self._events.append(
-                            FobEvent(
-                                timestamp=row["timestamp"],
-                                plate=row.get("plate", ""),
-                                action=row["action"],
-                                detail=row.get("detail", ""),
-                            )
-                        )
-                    except KeyError:
-                        continue
+            handle = open(self._csv_path, "r", newline="", encoding="utf-8")
+        except FileNotFoundError:
+            return
         except OSError:
             self._events = []
+            return
+        try:
+            reader = csv.DictReader(handle)
+            for row in reader:
+                try:
+                    self._events.append(
+                        FobEvent(
+                            sequence=int(row["sequence"]),
+                            plate=row.get("plate", ""),
+                            action=row["action"],
+                            detail=row.get("detail", ""),
+                        )
+                    )
+                except (KeyError, ValueError):
+                    continue
+        finally:
+            handle.close()
+        if self._events:
+            self._next_sequence = self._events[-1].sequence + 1
 
     def _save(self) -> None:
         """Persist the current in-memory event list to disk."""
-        directory = os.path.dirname(self._csv_path)
-        if directory:
-            os.makedirs(directory, exist_ok=True)
         with open(self._csv_path, "w", newline="", encoding="utf-8") as handle:
             writer = csv.DictWriter(handle, fieldnames=self.CSV_FIELDS)
             writer.writeheader()
@@ -93,7 +96,7 @@ class EventLog:
                 writer.writerow(event.to_dict())
 
     def record(self, plate: str, action: str, detail: str = "") -> FobEvent:
-        """Append a new event with the current timestamp.
+        """Append a new event with the next sequence number.
 
         Args:
             plate: Plate of the affected car, or empty string.
@@ -104,11 +107,12 @@ class EventLog:
             The event that was recorded (useful for immediate UI updates).
         """
         event = FobEvent(
-            timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            sequence=self._next_sequence,
             plate=plate,
             action=action,
             detail=detail,
         )
+        self._next_sequence += 1
         self._events.append(event)
         # Keep the log bounded; drop the oldest entries when over the cap.
         if len(self._events) > self.MAX_EVENTS:

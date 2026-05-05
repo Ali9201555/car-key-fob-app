@@ -1,7 +1,6 @@
 """Persistent manager for the collection of paired vehicles."""
 
 import csv
-import os
 
 from car import Car, make_car_from_dict
 
@@ -43,28 +42,30 @@ class CarManager:
     def load(self) -> None:
         """Load all cars from disk into memory.
 
-        Missing or empty files are treated as an empty collection.
-        Malformed rows are skipped but do not abort the whole load so a
-        single bad entry cannot lock the user out of their other vehicles.
+        Missing files are treated as an empty collection. Malformed
+        rows are skipped but do not abort the whole load so a single
+        bad entry cannot lock the user out of their other vehicles.
         """
         self._cars = {}
-        if not os.path.exists(self._csv_path):
+        try:
+            handle = open(self._csv_path, "r", newline="", encoding="utf-8")
+        except FileNotFoundError:
+            return
+        except OSError:
+            self._cars = {}
             return
         try:
-            with open(self._csv_path, "r", newline="", encoding="utf-8") as handle:
-                reader = csv.DictReader(handle)
-                for row in reader:
-                    try:
-                        car = make_car_from_dict(row)
-                        self._cars[car.plate] = car
-                    except (ValueError, KeyError):
-                        # Skip malformed rows so one corrupt record does
-                        # not hide the rest of the user's garage.
-                        continue
-        except OSError:
-            # File exists but cannot be read; leave the in-memory list
-            # empty rather than crashing the application.
-            self._cars = {}
+            reader = csv.DictReader(handle)
+            for row in reader:
+                try:
+                    car = make_car_from_dict(row)
+                    self._cars[car.plate] = car
+                except (ValueError, KeyError):
+                    # Skip malformed rows so one corrupt record does
+                    # not hide the rest of the user's garage.
+                    continue
+        finally:
+            handle.close()
 
         if self._cars and self._active_plate not in self._cars:
             # Pick the first car as the active one if none is selected.
@@ -75,13 +76,13 @@ class CarManager:
     def save(self) -> None:
         """Write the current in-memory state back to the CSV file.
 
+        The ``data`` directory is committed to the repository, so the
+        write target always exists when the app runs.
+
         Raises:
             OSError: If the file cannot be written. Callers should catch
                 this and surface a user-friendly message.
         """
-        directory = os.path.dirname(self._csv_path)
-        if directory:
-            os.makedirs(directory, exist_ok=True)
         with open(self._csv_path, "w", newline="", encoding="utf-8") as handle:
             writer = csv.DictWriter(handle, fieldnames=self.CSV_FIELDS)
             writer.writeheader()

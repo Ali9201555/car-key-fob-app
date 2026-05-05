@@ -4,8 +4,6 @@ The owner's PIN guards the panic alarm and remote-start buttons. The
 PIN is stored in a plain text file beside the other data files.
 """
 
-import os
-
 
 class UserAuth:
     """Manages the owner's PIN for operations like panic and remote start."""
@@ -27,24 +25,22 @@ class UserAuth:
 
     def _load_or_initialize(self) -> None:
         """Read the stored PIN, or seed it with the default 1234."""
-        if os.path.exists(self._auth_path):
-            try:
-                with open(self._auth_path, "r", encoding="utf-8") as handle:
-                    saved = handle.read().strip()
-                if saved:
-                    self._stored_pin = saved
-                    return
-            except OSError:
-                # Fall through and re-create the file with the default PIN.
-                pass
+        try:
+            with open(self._auth_path, "r", encoding="utf-8") as handle:
+                saved = handle.read().strip()
+            if saved:
+                self._stored_pin = saved
+                return
+        except FileNotFoundError:
+            pass
+        except OSError:
+            # Fall through and re-create the file with the default PIN.
+            pass
         self._stored_pin = self.DEFAULT_PIN
         self._save()
 
     def _save(self) -> None:
         """Persist the current PIN to disk."""
-        directory = os.path.dirname(self._auth_path)
-        if directory:
-            os.makedirs(directory, exist_ok=True)
         with open(self._auth_path, "w", encoding="utf-8") as handle:
             handle.write(self._stored_pin)
 

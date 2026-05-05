@@ -38,7 +38,7 @@ class HistoryView(QDialog):
 
         self._table = QTableWidget(0, 4)
         self._table.setHorizontalHeaderLabels(
-            ["Timestamp", "Plate", "Action", "Detail"]
+            ["#", "Plate", "Action", "Detail"]
         )
         self._table.horizontalHeader().setStretchLastSection(True)
         self._table.horizontalHeader().setSectionResizeMode(
@@ -70,7 +70,7 @@ class HistoryView(QDialog):
         events = self._log.recent(limit=200)
         self._table.setRowCount(len(events))
         for row, event in enumerate(events):
-            self._table.setItem(row, 0, QTableWidgetItem(event.timestamp))
+            self._table.setItem(row, 0, QTableWidgetItem(str(event.sequence)))
             self._table.setItem(row, 1, QTableWidgetItem(event.plate))
             self._table.setItem(row, 2, QTableWidgetItem(event.action))
             self._table.setItem(row, 3, QTableWidgetItem(event.detail))
