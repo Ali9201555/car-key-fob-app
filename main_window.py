@@ -147,11 +147,11 @@ class MainWindow(QMainWindow):
 
         # Right column: the virtual fob.
         self._fob = FobWidget()
-        self._fob.lock_pressed.connect(self._on_lock)
-        self._fob.unlock_pressed.connect(self._on_unlock)
-        self._fob.trunk_pressed.connect(self._on_trunk)
-        self._fob.panic_pressed.connect(self._on_panic)
-        self._fob.remote_start_pressed.connect(self._on_remote_start)
+        self._fob.get_lock_button().clicked.connect(self._on_lock)
+        self._fob.get_unlock_button().clicked.connect(self._on_unlock)
+        self._fob.get_trunk_button().clicked.connect(self._on_trunk)
+        self._fob.get_panic_button().clicked.connect(self._on_panic)
+        self._fob.get_remote_start_button().clicked.connect(self._on_remote_start)
         root.addWidget(self._fob, stretch=1)
 
         central.setStyleSheet("QWidget { background-color: #121620; color: #dfe3ea; }")
