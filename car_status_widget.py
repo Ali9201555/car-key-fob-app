@@ -51,8 +51,11 @@ class CarStatusWidget(QWidget):
         self._panic_flash = not self._panic_flash
         self.update()
 
-    def paintEvent(self, event: QPaintEvent) -> None:  # noqa: N802
+    def paintEvent(self, event: QPaintEvent) -> None:
         """Draw the current car and overlays each time the widget repaints.
+
+        The method name is camelCase because Qt's parent class declares it
+        that way; we override it to do our custom drawing.
 
         Args:
             event: The Qt paint event (unused, Qt supplies the clip).

@@ -81,7 +81,8 @@ class PinDialog(QDialog):
         pin = self._pin_edit.text()
         try:
             success = self._auth.attempt_login(pin)
-        except Exception as exc:  # noqa: BLE001 - surface any unexpected error
+        except Exception as exc:
+            # Surface any other unexpected error in a dialog.
             QMessageBox.critical(self, "Error", f"Unexpected error: {exc}")
             return
 

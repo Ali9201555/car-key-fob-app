@@ -77,7 +77,7 @@ if __name__ == "__main__":
         raise SystemExit(main())
     except SystemExit:
         raise
-    except Exception:  # noqa: BLE001 - crash handler for top-level failures
+    except Exception:
         # Surface unexpected startup failures in a dialog instead of a
         # silent stack trace so end users know what happened.
         message = traceback.format_exc()

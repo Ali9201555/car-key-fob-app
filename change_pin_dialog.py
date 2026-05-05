@@ -73,7 +73,8 @@ class ChangePinDialog(QDialog):
         except ValueError as exc:
             QMessageBox.warning(self, "Invalid PIN", str(exc))
             return
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
+            # Catch anything else so the dialog never crashes silently.
             QMessageBox.critical(self, "Error", f"Unexpected error: {exc}")
             return
         QMessageBox.information(

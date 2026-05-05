@@ -373,8 +373,12 @@ class MainWindow(QMainWindow):
     # Window lifecycle
     # ------------------------------------------------------------------
 
-    def closeEvent(self, event: object) -> None:  # noqa: N802 - Qt signature
-        """Persist state one last time before the window closes."""
+    def closeEvent(self, event: object) -> None:
+        """Persist state one last time before the window closes.
+
+        The method name is camelCase because Qt's parent class declares
+        it that way; we override it to flush state on shutdown.
+        """
         try:
             self._car_ctrl.save()
         except OSError:

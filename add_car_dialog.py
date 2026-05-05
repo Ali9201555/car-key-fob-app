@@ -84,7 +84,8 @@ class AddCarDialog(QDialog):
         except ValueError as exc:
             QMessageBox.warning(self, "Invalid input", str(exc))
             return
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
+            # Catch anything else so the dialog never crashes silently.
             QMessageBox.critical(
                 self,
                 "Error",
